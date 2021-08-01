@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	"github.com/andybalholm/brotli"
-
 	"github.com/kei2100/decompress-roundtripper"
 )
 
@@ -41,19 +40,19 @@ func TestRoundTripper_RoundTrip(t *testing.T) {
 		},
 		{
 			title:            "gzip",
-			resp:             newResponse(t, gzipBytes(t, []byte("foobarbaz")), "gzip"),
+			resp:             newResponse(t, gzipBytes([]byte("foobarbaz")), "gzip"),
 			wantBody:         "foobarbaz",
 			wantDecompressed: true,
 		},
 		{
 			title:            "deflate",
-			resp:             newResponse(t, deflateBytes(t, []byte("foobarbaz")), "deflate"),
+			resp:             newResponse(t, deflateBytes([]byte("foobarbaz")), "deflate"),
 			wantBody:         "foobarbaz",
 			wantDecompressed: true,
 		},
 		{
 			title:            "br",
-			resp:             newResponse(t, brotliBytes(t, []byte("foobarbaz")), "br"),
+			resp:             newResponse(t, brotliBytes([]byte("foobarbaz")), "br"),
 			wantBody:         "foobarbaz",
 			wantDecompressed: true,
 		},
@@ -67,14 +66,14 @@ func TestRoundTripper_RoundTrip(t *testing.T) {
 			title: "mixed",
 			resp: newResponse(
 				t,
-				deflateBytes(t, gzipBytes(t, []byte("foobarbaz"))),
+				deflateBytes(gzipBytes([]byte("foobarbaz"))),
 				"gzip, deflate"),
 			wantBody:         "foobarbaz",
 			wantDecompressed: true,
 		},
 		{
 			title:                      "unsupported encoding",
-			resp:                       newResponse(t, gzipBytes(t, []byte{1, 2, 3}), "unsupported, gzip"),
+			resp:                       newResponse(t, gzipBytes([]byte{1, 2, 3}), "unsupported, gzip"),
 			wantErrUnsupportedEncoding: true,
 		},
 	}
@@ -176,53 +175,50 @@ func copyAndReadAll(t *testing.T, resp *http.Response) []byte {
 	return cp.Bytes()
 }
 
-func gzipBytes(t *testing.T, b []byte) []byte {
-	t.Helper()
+func gzipBytes(b []byte) []byte {
 	var dst bytes.Buffer
 	w := gzip.NewWriter(&dst)
 	if _, err := w.Write(b); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	if err := w.Flush(); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	if err := w.Close(); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	return dst.Bytes()
 }
 
-func deflateBytes(t *testing.T, b []byte) []byte {
-	t.Helper()
+func deflateBytes(b []byte) []byte {
 	var dst bytes.Buffer
 	w, err := flate.NewWriter(&dst, flate.DefaultCompression)
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	if _, err := w.Write(b); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	if err := w.Flush(); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	if err := w.Close(); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	return dst.Bytes()
 }
 
-func brotliBytes(t *testing.T, b []byte) []byte {
-	t.Helper()
+func brotliBytes(b []byte) []byte {
 	var dst bytes.Buffer
 	w := brotli.NewWriter(&dst)
 	if _, err := w.Write(b); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	if err := w.Flush(); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	if err := w.Close(); err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
 	return dst.Bytes()
 }
