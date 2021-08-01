@@ -65,7 +65,7 @@ func (r *RoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 		case "identity", "":
 			// nop
 		default:
-			return nil, &ErrUnsupportedEncoding{Original: res, Encoding: encoding}
+			return nil, &ErrUnsupportedEncoding{Original: res, Encoding: ce}
 		}
 	}
 	if !decompressed {
